@@ -1,21 +1,18 @@
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Téléversement vers Google Drive via Zapier</title>
+    <title>Accès à la caméra</title>
 </head>
 <body>
-    <h1>Capture d'écran et Téléversement</h1>
+    <h1>Accès à la caméra</h1>
     <button id="cameraButton">Activer la caméra</button>
-    <button id="captureButton">Capturer l'image</button>
     <video id="video" width="640" height="480" autoplay></video>
-    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
-    <img id="screenshot" src="" alt="Capture d'écran" style="display:none;">
 
     <script>
-        const WEBHOOK_URL = 'YOUR_ZAPIER_WEBHOOK_URL'; // Remplacez par votre URL de webhook Zapier
-
         document.getElementById("cameraButton").addEventListener("click", function() {
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: true })
@@ -31,47 +28,6 @@
                 console.error("getUserMedia n'est pas supporté par ce navigateur");
             }
         });
-
-        document.getElementById("captureButton").addEventListener("click", function() {
-            var canvas = document.getElementById("canvas");
-            var context = canvas.getContext("2d");
-            var video = document.getElementById("video");
-            var screenshot = document.getElementById("screenshot");
-
-            // Dessiner la vidéo sur le canvas
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // Convertir le canvas en image
-            var dataURL = canvas.toDataURL("image/png");
-            screenshot.src = dataURL;
-            screenshot.style.display = 'block';
-            
-            // Convertir le dataURL en Blob
-            var fileContent = dataURLtoBlob(dataURL);
-
-            // Préparer les données pour l'envoi au webhook
-            var formData = new FormData();
-            formData.append('file', fileContent, 'screenshot.png');
-
-            // Envoyer la requête POST au webhook Zapier
-            fetch(WEBHOOK_URL, {
-                method: 'POST',
-                body: formData
-            }).then(response => response.json())
-              .then(data => console.log('File uploaded:', data))
-              .catch(error => console.error('Error:', error));
-        });
-
-        function dataURLtoBlob(dataURL) {
-            var byteString = atob(dataURL.split(',')[1]);
-            var mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
-            var ab = new ArrayBuffer(byteString.length);
-            var ia = new Uint8Array(ab);
-            for (var i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-            return new Blob([ab], { type: mimeString });
-        }
     </script>
 </body>
 </html>
