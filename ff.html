@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accès à la caméra</title>
+</head>
+<body>
+    <h1>Accès à la caméra</h1>
+    <button id="cameraButton">Activer la caméra</button>
+    <video id="video" width="640" height="480" autoplay></video>
+
+    <script>
+        document.getElementById("cameraButton").addEventListener("click", function() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        var video = document.getElementById("video");
+                        video.srcObject = stream;
+                        video.play();
+                    })
+                    .catch(function(error) {
+                        console.error("Erreur lors de l'accès à la caméra:", error);
+                    });
+            } else {
+                console.error("getUserMedia n'est pas supporté par ce navigateur");
+            }
+        });
+    </script>
+</body>
+</html>
