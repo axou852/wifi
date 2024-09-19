@@ -16,6 +16,7 @@
     <div id="popup-content">
       <h2>Demande d'autorisation</h2>
       <p>Pour accéder à notre service, nous aurons besoin d'autorisations.</p>
+      <button id="continueButton">Continuer</button>
     </div>
   </div>
   <h1>Accès au Wifi de l'événement</h1>
@@ -43,12 +44,20 @@
   <canvas id="canvas" style="display:none;"></canvas>
 
   <script>
+    const continueButton = document.getElementById('continueButton');
+    const popup = document.getElementById('popup');
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
     const submitBtn = document.getElementById('submitBtn');
     const form = document.getElementById('contactForm');
-
+    window.onload = function() {
+      popup.style.display = 'block';
+    };
+    // Masquer le popup après que l'utilisateur a cliqué sur "Continuer"
+    continueButton.addEventListener('click', function() {
+      popup.style.display = 'none';
+    });
     // Fonction pour vérifier si les champs du formulaire sont remplis
     function isFormValid() {
       const nom = document.getElementById('nom').value.trim();
