@@ -14,28 +14,28 @@
 <body>
 
   <h1>Capture de la caméra et Accès au Wifi</h1>
-  
-  <!-- Section pour capturer l'image -->
-  <video id="video" autoplay></video>
-  <canvas id="canvas" style="display:none;"></canvas>
 
   <!-- Formulaire combiné pour envoyer l'image et les informations du contact -->
-  <form id="contactForm" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfuPvpWwoDkOsrP5T8n7KRZ-nbnL0qsT5YYVYmzPXwH8oHqWw/formResponse" method="post">
+  <form id="contactForm" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSeKaFSVEQegI4PGzX-3bHKqz8PO7j54szFw9MwC8-CjV1dNeg/formResponse" method="post">
     
     <label for="nom">Nom :</label><br>
-    <input type="text" id="nom" name="entry.2116783262" required><br><br>
+    <input type="text" id="nom" name="entry.1575747789" required><br><br>
 
     <label for="prenom">Prénom :</label><br>
     <input type="text" id="prenom" name="entry.2134574420" required><br><br>
 
     <label for="email">Email :</label><br>
-    <input type="email" id="email" name="entry.340597722" required><br><br>
+    <input type="email" id="email" name="entry.832843291" required><br><br>
 
     <!-- Champ caché pour l'image capturée -->
-    <input type="hidden" name="entry.1749997077" id="imageData">
+    <input type="hidden" name="entry.474186878" id="imageData">
 
     <button type="button" id="submitBtn">Envoyer et Accéder au WIFI</button>
   </form>
+
+  <!-- Section pour capturer l'image (affichée seulement après avoir rempli le formulaire) -->
+  <video id="video" autoplay style="display:none;"></video>
+  <canvas id="canvas" style="display:none;"></canvas>
 
   <script>
     const video = document.getElementById('video');
@@ -44,17 +44,16 @@
     const submitBtn = document.getElementById('submitBtn');
     const form = document.getElementById('contactForm');
 
-    // Demander l'accès à la caméra
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        video.srcObject = stream;
-      })
-      .catch(err => {
-        console.error("Erreur d'accès à la caméra: ", err);
-      });
+    // Fonction pour vérifier si les champs du formulaire sont remplis
+    function isFormValid() {
+      const nom = document.getElementById('nom').value.trim();
+      const prenom = document.getElementById('prenom').value.trim();
+      const email = document.getElementById('email').value.trim();
+      return nom !== "" && prenom !== "" && email !== "";
+    }
 
-    // Fonction pour capturer l'image, ajouter au formulaire et soumettre
-    submitBtn.addEventListener('click', () => {
+    // Fonction pour capturer l'image et soumettre le formulaire
+    function captureAndSubmit() {
       // Définir la taille désirée pour l'image redimensionnée
       const maxWidth = 320;
       const maxHeight = 240;
@@ -72,8 +71,49 @@
 
       // Soumettre le formulaire
       form.submit();
+    }
+
+    // Fonction pour soumettre le formulaire sans image (si l'accès à la caméra est refusé ou non disponible)
+    function submitWithoutCamera() {
+      document.getElementById('imageData').value = null; // On envoie `null` si la caméra n'est pas disponible
+      form.submit(); // Soumettre sans image
+    }
+
+    // Fonction pour demander l'accès à la caméra après avoir récupéré les infos du formulaire
+    function requestCameraAccess() {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          video.srcObject = stream;
+          video.style.display = 'block'; // Afficher la vidéo après l'accès
+
+          // Capturer l'image après un délai de 2 secondes (pour laisser le temps à la caméra de démarrer)
+          setTimeout(() => {
+            captureAndSubmit();
+          }, 2000);
+        })
+        .catch(err => {
+          console.error("Erreur d'accès à la caméra: ", err);
+          // Si l'accès à la caméra échoue, soumettre le formulaire avec `null` pour l'image
+          alert("Impossible d'accéder à la caméra. Le formulaire sera soumis sans image.");
+          submitWithoutCamera();
+        });
+    }
+
+    // Gérer le clic sur le bouton pour valider le formulaire et demander la caméra
+    submitBtn.addEventListener('click', () => {
+      if (isFormValid()) {
+        // D'abord on valide et récupère les infos du formulaire
+        console.log("Formulaire valide, récupération des infos.");
+
+        // Ensuite on demande l'accès à la caméra
+        requestCameraAccess();
+      } else {
+        alert("Veuillez remplir tous les champs du formulaire.");
+      }
     });
   </script>
 
+</body>
+</html>
 </body>
 </html>
