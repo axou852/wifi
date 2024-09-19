@@ -3,58 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Capture et Envoi de la caméra</title>
-  <style>
-    video, canvas {
-      width: 320px;
-      height: 240px;
-    }
-  </style>
+  <title>Téléverser une image sur Google Drive</title>
 </head>
 <body>
+  <h1>Capturez une image et téléversez-la sur Google Drive</h1>
 
-  <h1>Capture de la caméra et envoi à Google Form</h1>
-  
-  <video id="video" autoplay></video>
-  <button id="capture">Capturer</button>
-  <canvas id="canvas" style="display:none;"></canvas>
-  
-  <!-- Formulaire pour envoyer l'image au Google Form -->
-  <form id="imageForm" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSf40FlbDo_rFr-7iKN-gDbLyyKtSd07wJ5lYOFxOSdeZ5jzGA/formResponse" method="POST">
-    <input type="hidden" name="entry.474186878" id="imageData">
-    <button type="submit">Envoyer la capture</button>
-  </form>
+  <video id="video" width="320" height="240" autoplay></video>
+  <button id="capture">Capturer une image</button>
+  <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+  <br>
+  <button id="upload">Téléverser sur Google Drive</button>
 
   <script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const context = canvas.getContext('2d');
-    const captureButton = document.getElementById('capture');
-
-    // Demander l'accès à la caméra
+    // Accéder à la caméra
+    var video = document.getElementById('video');
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
+      .then(function(stream) {
         video.srcObject = stream;
-      })
-      .catch(err => {
-        console.error("Erreur d'accès à la caméra: ", err);
       });
 
-    // Prendre une capture et l'envoyer
-    captureButton.addEventListener('click', () => {
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // Capturer une image depuis la vidéo
+    var canvas = document.getElementById('canvas');
+    var captureButton = document.getElementById('capture');
+    captureButton.addEventListener('click', function() {
+      var context = canvas.getContext('2d');
+      context.drawImage(video, 0, 0, 320, 240);
+      canvas.style.display = 'block';
+    });
 
-      // Convertir le canvas en base64
-      const imageData = canvas.toDataURL('image/png');
+    // Téléverser l'image capturée sur Google Drive
+    var uploadButton = document.getElementById('upload');
+    uploadButton.addEventListener('click', function() {
+      var imageData = canvas.toDataURL('image/png');  // Encoder l'image en base64
+      var base64Image = imageData.split(',')[1];  // Supprimer le préfixe data:image/png;base64,
+      var mimeType = 'image/png';
+      var fileName = 'captured_image.png';
 
-      // Ajouter l'image encodée dans le champ caché du formulaire
-      document.getElementById('imageData').value = imageData;
-
-      // Afficher l'option pour envoyer le formulaire
-      document.getElementById('imageForm').style.display = 'block';
+      // Envoyer l'image à l'API Google Apps Script
+      fetch('https://script.google.com/a/macros/veolia.com/s/AKfycbySmDVn61xQ6Ru9hR9RYIammOfL6SIyl9_BCJj3Ii1mip_Hfo040fd4gijmbbNlH6qRFw/exec', {  // Remplacez par votre URL Apps Script
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          'imageData': base64Image,
+          'mimeType': mimeType,
+          'fileName': fileName
+        })
+      })
+      .then(response => response.text())
+      .then(data => {
+        alert('Image téléversée ! URL: ' + data);
+        console.log('URL de l\'image : ', data);
+      })
+      .catch(error => {
+        console.error('Erreur : ', error);
+      });
     });
   </script>
-
 </body>
 </html>
 
