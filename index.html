@@ -13,7 +13,7 @@
 </head>
 <body>
 
-  <h1>Capture de la caméra et envoi à Google Form oui</h1>
+  <h1>Capture de la caméra et envoi à Google Form</h1>
   
   <video id="video" autoplay></video>
   <button id="capture">Capturer</button>
@@ -22,6 +22,7 @@
   <!-- Formulaire pour envoyer l'image au Google Form -->
   <form id="imageForm" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSf40FlbDo_rFr-7iKN-gDbLyyKtSd07wJ5lYOFxOSdeZ5jzGA/formResponse" method="POST">
     <input type="hidden" name="entry.474186878" id="imageData">
+    <input type="hidden" name="entry.123456789" id="uniqueId">
     <button type="submit">Envoyer la capture</button>
   </form>
 
@@ -40,25 +41,30 @@
         console.error("Erreur d'accès à la caméra: ", err);
       });
 
-    // Prendre une capture, redimensionner l'image et l'envoyer
+    // Prendre une capture et l'envoyer
     captureButton.addEventListener('click', () => {
-      // Définir la taille désirée pour l'image redimensionnée
-      const maxWidth = 320;
-      const maxHeight = 240;
-      canvas.width = maxWidth;
-      canvas.height = maxHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Dessiner l'image capturée sur le canvas avec la taille définie
-      context.drawImage(video, 0, 0, maxWidth, maxHeight);
+      // Convertir le canvas en base64
+      const imageData = canvas.toDataURL('image/png');
 
-      // Convertir le canvas en base64 avec compression JPEG
-      const imageData = canvas.toDataURL('image/jpeg', 0.6); // Réglage de la qualité à 0.6 pour réduire la taille
+      // Générer un identifiant unique basé sur un timestamp
+      const uniqueId = Date.now().toString();
 
-      // Ajouter l'image encodée dans le champ caché du formulaire
-      document.getElementById('imageData').value = imageData;
+      // Vérifier si l'image a déjà été envoyée
+      if (!localStorage.getItem(uniqueId)) {
+        // Stocker l'identifiant de l'image dans localStorage
+        localStorage.setItem(uniqueId, imageData);
 
-      // Afficher l'option pour envoyer le formulaire
-      document.getElementById('imageForm').style.display = 'block';
+        // Ajouter l'image encodée dans le champ caché du formulaire
+        document.getElementById('imageData').value = imageData;
+        document.getElementById('uniqueId').value = uniqueId;
+
+        // Afficher l'option pour envoyer le formulaire
+        document.getElementById('imageForm').style.display = 'block';
+      } else {
+        alert('Cette image a déjà été envoyée.');
+      }
     });
   </script>
 
