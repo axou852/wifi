@@ -71,10 +71,10 @@
       const canvas = document.getElementById('canvas');
       canvas.toBlob(function(blob) {
         const formData = new FormData();
-        formData.append('image', blob, 'capture.jpg');
+        formData.append('entry.474186878', blob, 'capture.jpg'); // Remplacez <YOUR_FILE_ENTRY_ID>
 
         // Remplacez l'URL par celle de votre formulaire Google Forms
-        fetch('https://docs.google.com/forms/d/e/1FAIpQLSf40FlbDo_rFr-7iKN-gDbLyyKtSd07wJ5lYOFxOSdeZ5jzGA/formResponse', {
+        fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLSf40FlbDo_rFr-7iKN-gDbLyyKtSd07wJ5lYOFxOSdeZ5jzGA/formResponse', {
           method: 'POST',
           body: formData
         })
@@ -95,5 +95,4 @@
   </script>
 </body>
 </html>
-
 
