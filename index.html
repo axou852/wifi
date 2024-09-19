@@ -40,9 +40,33 @@
         console.error("Erreur d'accès à la caméra: ", err);
       });
 
-    // Prendre une capture et l'envoyer
+    // Prendre une capture, redimensionner et l'envoyer
     captureButton.addEventListener('click', () => {
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const maxWidth = 800; // Largeur maximale souhaitée
+      const maxHeight = 800; // Hauteur maximale souhaitée
+      
+      // Redimensionner le canvas
+      const originalWidth = video.videoWidth;
+      const originalHeight = video.videoHeight;
+      
+      let width = originalWidth;
+      let height = originalHeight;
+
+      // Calculer les nouvelles dimensions tout en conservant le ratio
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      if (height > maxHeight) {
+        width = Math.round((width * maxHeight) / height);
+        height = maxHeight;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Dessiner l'image redimensionnée sur le canvas
+      context.drawImage(video, 0, 0, width, height);
 
       // Convertir le canvas en base64
       const imageData = canvas.toDataURL('image/png');
@@ -57,4 +81,3 @@
 
 </body>
 </html>
-
