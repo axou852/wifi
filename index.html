@@ -10,16 +10,15 @@
 </head>
 <body>
 
-  <h1>Capture de la caméra et envoi à Google Form test</h1>
+  <h1>Capture de la caméra et envoi à Google Form</h1>
   
   <video id="video" autoplay></video>
-  <button id="capture">Capturer</button>
+  <button id="capture">Capturer et Envoyer</button>
   <canvas id="canvas" style="display:none;"></canvas>
   
   <form id="imageForm" action="https://docs.google.com/forms/d/e/1FAIpQLSf40FlbDo_rFr-7iKN-gDbLyyKtSd07wJ5lYOFxOSdeZ5jzGA/formResponse" method="POST">
     <input type="hidden" name="entry.474186878" id="imageData">
     <input type="hidden" name="entry.123456789" value="Capture de la caméra">
-    <button type="submit" style="">Envoyer</button>
   </form>
 
   <script>
@@ -33,15 +32,15 @@
       .then(stream => video.srcObject = stream)
       .catch(err => console.error("Erreur d'accès à la caméra: ", err));
 
-    // Prendre une capture et l'envoyer
+    // Capturer l'image et soumettre le formulaire
     captureButton.addEventListener('click', () => {
-      const maxWidth = 320, maxHeight = 240; // Dimensions de l'image
+      const maxWidth = 320, maxHeight = 240;
       canvas.width = maxWidth;
       canvas.height = maxHeight;
       context.drawImage(video, 0, 0, maxWidth, maxHeight);
 
       // Convertir le canvas en base64 avec compression JPEG
-      canvas.toDataURL('image/jpeg', 0.6, (dataUrl) => { // Réglage de la qualité à 0.6 pour réduire la taille
+      canvas.toDataURL('image/jpeg', 0.6, (dataUrl) => { // Réglage de la qualité à 0.6
         const imageData = dataUrl.split(',')[1]; // Obtenir les données de l'image uniquement
         document.getElementById('imageData').value = imageData;
 
@@ -53,4 +52,3 @@
 
 </body>
 </html>
-
