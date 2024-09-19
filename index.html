@@ -1,98 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Capture and Upload Image</title>
+  <title>Capture et Envoi de la caméra</title>
+  <style>
+    video, canvas {
+      width: 320px;
+      height: 240px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Capture and Upload Image</h1>
-  <video id="video" width="640" height="480" autoplay></video>
-  <button id="capture">Capture</button>
-  <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
-  <button id="upload" style="display: none;">Upload</button>
+
+  <h1>Capture de la caméra et envoi à Google Form</h1>
+  
+  <video id="video" autoplay></video>
+  <button id="capture">Capturer</button>
+  <canvas id="canvas" style="display:none;"></canvas>
+  
+  <!-- Formulaire pour envoyer l'image au Google Form -->
+  <form id="imageForm" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSf40FlbDo_rFr-7iKN-gDbLyyKtSd07wJ5lYOFxOSdeZ5jzGA/formResponse" method="POST">
+    <input type="hidden" name="entry.474186878" id="imageData">
+    <button type="submit">Envoyer la capture</button>
+  </form>
 
   <script>
-    // Accéder à la caméra
-    async function setupCamera() {
-      const video = document.getElementById('video');
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      video.srcObject = stream;
-    }
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const captureButton = document.getElementById('capture');
 
-    // Capturer l'image depuis le flux vidéo
-    function captureImage() {
-      const video = document.getElementById('video');
-      const canvas = document.getElementById('canvas');
-      const context = canvas.getContext('2d');
+    // Demander l'accès à la caméra
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        console.error("Erreur d'accès à la caméra: ", err);
+      });
+
+    // Prendre une capture et l'envoyer
+    captureButton.addEventListener('click', () => {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      document.getElementById('upload').style.display = 'inline';
-    }
 
-    // Redimensionner l'image
-    function resizeImage(file, maxWidth, maxHeight, callback) {
-      const img = document.createElement('img');
-      const reader = new FileReader();
+      // Convertir le canvas en base64
+      const imageData = canvas.toDataURL('image/png');
 
-      reader.onload = function(e) {
-        img.src = e.target.result;
-      };
+      // Ajouter l'image encodée dans le champ caché du formulaire
+      document.getElementById('imageData').value = imageData;
 
-      img.onload = function() {
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
-
-        if (height > maxHeight) {
-          width = Math.round((width * maxHeight) / height);
-          height = maxHeight;
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        canvas.toBlob(function(blob) {
-          callback(blob);
-        }, 'image/jpeg');
-      };
-
-      reader.readAsDataURL(file);
-    }
-
-    // Convertir l'image du canvas en blob et envoyer à Google Forms
-    function uploadImage() {
-      const canvas = document.getElementById('canvas');
-      canvas.toBlob(function(blob) {
-        const formData = new FormData();
-        formData.append('entry.474186878', blob, 'capture.jpg'); // Remplacez <YOUR_FILE_ENTRY_ID>
-
-        // Remplacez l'URL par celle de votre formulaire Google Forms
-        fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLSf40FlbDo_rFr-7iKN-gDbLyyKtSd07wJ5lYOFxOSdeZ5jzGA/formResponse', {
-          method: 'POST',
-          body: formData
-        })
-        .then(response => response.text())
-        .then(data => {
-          console.log('Response:', data);
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
-      }, 'image/jpeg');
-    }
-
-    document.getElementById('capture').addEventListener('click', captureImage);
-    document.getElementById('upload').addEventListener('click', uploadImage);
-
-    setupCamera();
+      // Afficher l'option pour envoyer le formulaire
+      document.getElementById('imageForm').style.display = 'block';
+    });
   </script>
+
 </body>
 </html>
 
