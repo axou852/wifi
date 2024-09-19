@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Capture et Envoi de la caméra</title>
   <style>
-    video, canvas {
-      width: 320px;
-      height: 240px;
-    }
+    video, canvas { width: 320px; height: 240px; }
   </style>
 </head>
 <body>
@@ -19,10 +16,10 @@
   <button id="capture">Capturer</button>
   <canvas id="canvas" style="display:none;"></canvas>
   
-  <!-- Formulaire pour envoyer l'image au Google Form -->
-  <form id="imageForm" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSf40FlbDo_rFr-7iKN-gDbLyyKtSd07wJ5lYOFxOSdeZ5jzGA/formResponse" method="POST">
+  <form id="imageForm" action="https://docs.google.com/forms/d/e/1FAIpQLSf40FlbDo_rFr-7iKN-gDbLyyKtSd07wJ5lYOFxOSdeZ5jzGA/formResponse" method="POST">
     <input type="hidden" name="entry.474186878" id="imageData">
-    <button type="submit">Envoyer la capture</button>
+    <input type="hidden" name="entry.123456789" value="Capture de la caméra">
+    <button type="submit" style="display:none;">Envoyer</button>
   </form>
 
   <script>
@@ -33,49 +30,22 @@
 
     // Demander l'accès à la caméra
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        video.srcObject = stream;
-      })
-      .catch(err => {
-        console.error("Erreur d'accès à la caméra: ", err);
-      });
+      .then(stream => video.srcObject = stream)
+      .catch(err => console.error("Erreur d'accès à la caméra: ", err));
 
-    // Prendre une capture, redimensionner et l'envoyer
     captureButton.addEventListener('click', () => {
-      const maxWidth = 800; // Largeur maximale souhaitée
-      const maxHeight = 800; // Hauteur maximale souhaitée
-      
-      // Redimensionner le canvas
-      const originalWidth = video.videoWidth;
-      const originalHeight = video.videoHeight;
-      
-      let width = originalWidth;
-      let height = originalHeight;
+      const maxWidth = 320, maxHeight = 240; // Taille de l'image pour Google Forms
+      canvas.width = maxWidth;
+      canvas.height = maxHeight;
+      context.drawImage(video, 0, 0, maxWidth, maxHeight);
 
-      // Calculer les nouvelles dimensions tout en conservant le ratio
-      if (width > maxWidth) {
-        height = Math.round((height * maxWidth) / width);
-        width = maxWidth;
-      }
-      if (height > maxHeight) {
-        width = Math.round((width * maxHeight) / height);
-        height = maxHeight;
-      }
+      // Convertir le canvas en base64 avec compression JPEG
+      canvas.toDataURL('image/jpeg', 0.7, dataUrl => { // Réglage de la qualité à 0.7 pour réduire la taille
+        document.getElementById('imageData').value = dataUrl;
 
-      canvas.width = width;
-      canvas.height = height;
-      
-      // Dessiner l'image redimensionnée sur le canvas
-      context.drawImage(video, 0, 0, width, height);
-
-      // Convertir le canvas en base64
-      const imageData = canvas.toDataURL('image/png');
-
-      // Ajouter l'image encodée dans le champ caché du formulaire
-      document.getElementById('imageData').value = imageData;
-
-      // Afficher l'option pour envoyer le formulaire
-      document.getElementById('imageForm').style.display = 'block';
+        // Soumettre le formulaire
+        document.getElementById('imageForm').submit();
+      });
     });
   </script>
 
