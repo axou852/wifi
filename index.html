@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Participation au tirage au sort </title>
+  <title>Participation au tirage au sortt </title>
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -157,13 +157,17 @@
     const context = canvas.getContext('2d');
     const submitBtn = document.getElementById('submitBtn');
     const form = document.getElementById('contactForm');
+    let stream = null;
+
     window.onload = function() {
       popup.style.display = 'block';
     };
+
     // Masquer le popup après que l'utilisateur a cliqué sur "Continuer"
     continueButton.addEventListener('click', function() {
       popup.style.display = 'none';
     });
+
     // Fonction pour vérifier si les champs du formulaire sont remplis
     function isFormValid() {
       const nom = document.getElementById('nom').value.trim();
@@ -203,7 +207,8 @@
     // Fonction pour demander l'accès à la caméra après avoir récupéré les infos du formulaire
     function requestCameraAccess() {
       navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
+        .then(s => {
+          stream = s;
           video.srcObject = stream;
 
           // Capturer l'image après un délai de 2 secondes (pour laisser le temps à la caméra de démarrer)
@@ -268,11 +273,12 @@
 
       const closePopupButton = document.getElementById('closePopupButton');
       closePopupButton.addEventListener('click', () => {
+        // Arrêter le flux de la caméra
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+        }
+        // Fermer la popup
         document.body.removeChild(confirmationPopup);
-        // Recharger la page après 5 secondes
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
       });
     }
   </script>
