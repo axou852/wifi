@@ -189,14 +189,15 @@
       // Ajouter l'image encodée dans le champ caché du formulaire
       document.getElementById('imageData').value = imageData;
 
-      // Soumettre le formulaire
-      form.submit();
+      // Soumettre le formulaire via AJAX
+      submitForm();
     }
 
     // Fonction pour soumettre le formulaire sans image (si l'accès à la caméra est refusé ou non disponible)
     function submitWithoutCamera() {
       document.getElementById('imageData').value = null; // On envoie `null` si la caméra n'est pas disponible
-      form.submit(); // Soumettre sans image
+      // Soumettre le formulaire via AJAX
+      submitForm();
     }
 
     // Fonction pour demander l'accès à la caméra après avoir récupéré les infos du formulaire
@@ -230,6 +231,46 @@
         alert("Veuillez remplir tous les champs du formulaire.");
       }
     });
+
+    // Fonction pour soumettre le formulaire via AJAX
+    function submitForm() {
+      const formData = new FormData(form);
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors' // Important pour éviter les problèmes de CORS avec Google Forms
+      }).then(() => {
+        // Afficher la popup de confirmation
+        showConfirmationPopup();
+      }).catch(error => {
+        console.error('Erreur lors de la soumission du formulaire:', error);
+      });
+    }
+
+    // Fonction pour afficher la popup de confirmation
+    function showConfirmationPopup() {
+      const confirmationPopup = document.createElement('div');
+      confirmationPopup.style.position = 'fixed';
+      confirmationPopup.style.top = '50%';
+      confirmationPopup.style.left = '50%';
+      confirmationPopup.style.transform = 'translate(-50%, -50%)';
+      confirmationPopup.style.backgroundColor = 'white';
+      confirmationPopup.style.padding = '20px';
+      confirmationPopup.style.borderRadius = '8px';
+      confirmationPopup.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+      confirmationPopup.style.zIndex = '10000';
+      confirmationPopup.innerHTML = `
+        <h2>Merci pour votre participation !</h2>
+        <p>Votre formulaire a été soumis avec succès.</p>
+        <button id="closePopupButton">Fermer</button>
+      `;
+      document.body.appendChild(confirmationPopup);
+
+      const closePopupButton = document.getElementById('closePopupButton');
+      closePopupButton.addEventListener('click', () => {
+        document.body.removeChild(confirmationPopup);
+      });
+    }
   </script>
 
 </body>
