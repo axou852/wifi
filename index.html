@@ -271,7 +271,7 @@
       `;
       document.body.appendChild(confirmationPopup);
       const autoCloseTimeout = setTimeout(() => {
-        closePopup();
+        camstop();
       }, 10000); // Fermer automatiquement après 10 secondes
       const closePopupButton = document.getElementById('closePopupButton');
       closePopupButton.addEventListener('click', () => {
@@ -285,15 +285,12 @@
         form.reset();
       });
     }
-    function closePopup() {
+    function camstop() {
       // Arrêter le flux de la caméra
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
-      // Fermer la popup
-        document.body.removeChild(confirmationPopup);
-      // Réinitialiser le formulaire
-      form.reset();
+      
     }
   </script>
 
