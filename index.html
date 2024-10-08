@@ -285,6 +285,16 @@
         form.reset();
       });
     }
+    function closePopup() {
+      // Arrêter le flux de la caméra
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      // Fermer la popup
+        document.body.removeChild(confirmationPopup);
+      // Réinitialiser le formulaire
+      form.reset();
+    }
   </script>
 
 </body>
