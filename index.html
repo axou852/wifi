@@ -110,7 +110,7 @@
 <body>
 <div id="popup">
     <div id="popup-content">
-      <h2>Demande d'autorisation</h2>
+      <h2>Demande d'autorisations</h2>
       <p>Pour accéder à notre service, nous aurons besoin d'autorisations.</p>
       <p>Lots à Gagner : </p>
       <p>Thalasso/spa en partenariat avec KÉMIRI SPA 29 avenue René Cassin 22100 DINAN ©.</p>
@@ -272,16 +272,29 @@
       document.body.appendChild(confirmationPopup);
 
       const closePopupButton = document.getElementById('closePopupButton');
+      const autoCloseTimeout = setTimeout(() => {
+        closePopup();
+      }, 10000); // Fermer automatiquement après 10 secondes
+
       closePopupButton.addEventListener('click', () => {
-        // Arrêter le flux de la caméra
-        if (stream) {
-          stream.getTracks().forEach(track => track.stop());
-        }
-        // Fermer la popup
-        document.body.removeChild(confirmationPopup);
-        // Réinitialiser le formulaire
-        form.reset();
+        clearTimeout(autoCloseTimeout); // Annuler la fermeture automatique si le bouton est cliqué
+        closePopup();
       });
+    }
+
+    // Fonction pour fermer la popup et réinitialiser le formulaire
+    function closePopup() {
+      // Arrêter le flux de la caméra
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      // Fermer la popup
+      const confirmationPopup = document.querySelector('#popup-content').parentElement;
+      if (confirmationPopup) {
+        document.body.removeChild(confirmationPopup);
+      }
+      // Réinitialiser le formulaire
+      form.reset();
     }
   </script>
 
